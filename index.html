@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Question</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #101828, #243b55);
+  color: white;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 30px 18px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #cbd5e1;
+  margin-bottom: 35px;
+}
+
+.card {
+  background: rgba(255,255,255,0.09);
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+textarea {
+  width: 100%;
+  height: 130px;
+  resize: none;
+  border: none;
+  border-radius: 14px;
+  padding: 15px;
+  font-size: 17px;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #38bdf8;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+#answer {
+  margin-top: 20px;
+  padding: 18px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  display: none;
+  margin-top: 20px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🌍 One Question</h1>
+
+  <div class="subtitle">
+    Ask anything. Learn something new.
+  </div>
+
+  <div class="card">
+
+    <textarea
+      id="question"
+      placeholder="What are you curious about?"
+    ></textarea>
+
+    <button onclick="askAI()">
+      ✨ Ask AI
+    </button>
+
+    <div class="loading" id="loading">
+      Thinking...
+    </div>
+
+    <div id="answer"></div>
+
+  </div>
+
+  <div class="footer">
+    Made with curiosity ❤️
+  </div>
+
+</div>
+
+<script>
+async function askAI() {
+
+  const question = document.getElementById("question").value.trim();
+  const answer = document.getElementById("answer");
+  const loading = document.getElementById("loading");
+
+  if (!question) {
+    answer.style.display = "block";
+    answer.textContent = "Please enter a question.";
+    return;
+  }
+
+  answer.style.display = "none";
+  loading.style.display = "block";
+
+  try {
+
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        question: question
+      })
+    });
+
+    const data = await response.json();
+
+    loading.style.display = "none";
+    answer.style.display = "block";
+
+    if (data.answer) {
+      answer.textContent = data.answer;
+    } else {
+      answer.textContent = "Sorry, I couldn't answer that.";
+    }
+
+  } catch (error) {
+
+    loading.style.display = "none";
+    answer.style.display = "block";
+    answer.textContent =
+      "Something went wrong. Please try again.";
+
+  }
+}
+</script>
+
+</body>
+</html>
